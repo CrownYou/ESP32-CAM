@@ -34,10 +34,10 @@ try:
 except Exception:
     print('未识别到SD卡')
 else:
-    # 将新图片存在新文件夹中，SD中最多保留4个文件夹，自动删除最老的
+    # 将新图片存在新文件夹中，SD中最多保留6个文件夹，自动删除最老的
     dirs = get_numeric_dirs(SD_PATH)
 
-    if len(dirs) >= 4:
+    if len(dirs) >= 6:
         delete_smallest_dir(SD_PATH, dirs)
         dirs = get_numeric_dirs(SD_PATH)  # 更新列表
 
@@ -184,7 +184,7 @@ else:  # 不联网状态下的默认设置
     camera.saturation(0)
     camera.flip(0)
     camera.mirror(0)
-    camera.framesize(camera.FRAME_HQVGA)
+    camera.framesize(camera.FRAME_VGA)
     camera.quality(10)
     camera.contrast(0)
     camera.whitebalance(camera.WB_NONE)
