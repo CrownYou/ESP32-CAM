@@ -48,13 +48,13 @@ def load_images():
             except Exception:
                 label1.config(text=f'当前帧数：{current_index} / {image_nums}    进度条：', font=mid_font)
                 percent.set(int(current_index / image_nums * 100))
-                current_index = (1 + current_index) % image_nums + 1
+                current_index = (1 + current_index) % image_nums
                 continue
             canvas.delete("all")
             canvas.create_image(0, 0, image=photo, anchor=tk.NW)
             label1.config(text=f'当前帧数：{current_index} / {image_nums}    进度条：', font=mid_font)
             percent.set(int(current_index / image_nums * 100))
-            current_index = (1 + current_index) % image_nums + 1
+            current_index = (1 + current_index) % image_nums
             window.update()
             while paused_flag and not new_video_selected:
                 time.sleep(0.2)
