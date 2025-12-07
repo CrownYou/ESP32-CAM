@@ -15,3 +15,5 @@
 如果你在ESP32-CAM的卡槽内插入了SD卡，那么程序会自动将捕获的视频保存在里面，你可以用VideoShower.py来播放这些视频。效果如下：
 
 ![视频播放器](1.png)
+
+强烈建议SD卡选择专供监控摄像头的 high endurance 或 pro endurance 种类的，不然极容易写坏。

@@ -19,6 +19,7 @@ frame_rate = 10
 mirror = False
 new_video_selected = False
 
+
 def run_as_thread(func):  # 装饰器，让函数运行时另开一个线程
     def wrapper(*args, **kwargs):
         t = threading.Thread(target=func, args=args, kwargs=kwargs)

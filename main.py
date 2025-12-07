@@ -14,12 +14,14 @@ sd_loaded = wifi_connected = False
 # SD 卡挂载路径（根据你的实际挂载点调整）
 SD_PATH = "/sd"
 
+
 # 获取 SD 卡根目录下的所有文件夹（名称为数字）
 def get_numeric_dirs(path):
     return sorted([
         name for name in os.listdir(path)
         if name.isdigit() and os.stat(path + "/" + name)[0] & 0x4000  # 判断是否为目录
     ], key=int)
+
 
 # 删除最小名称的文件夹
 def delete_smallest_dir(path, dirs):
@@ -29,15 +31,16 @@ def delete_smallest_dir(path, dirs):
         os.remove(full_path + "/" + file)
     os.rmdir(full_path)
 
+
 try:
     uos.mount(SDCard(), SD_PATH)
 except Exception:
     print('未识别到SD卡')
 else:
-    # 将新图片存在新文件夹中，SD中最多保留6个文件夹，自动删除最老的
+    # 将新图片存在新文件夹中，SD中最多保留15个文件夹，自动删除最老的
     dirs = get_numeric_dirs(SD_PATH)
 
-    if len(dirs) >= 6:
+    if len(dirs) >= 15:
         delete_smallest_dir(SD_PATH, dirs)
         dirs = get_numeric_dirs(SD_PATH)  # 更新列表
 
@@ -62,7 +65,7 @@ else:
 def connect_wifi(ssid, password, timeout=5):
     wlan = network.WLAN(network.STA_IF)
     wlan.active(True)
-    
+
     if wlan.isconnected():
         wlan.disconnect()
         time.sleep(1)
@@ -78,14 +81,15 @@ def connect_wifi(ssid, password, timeout=5):
             time.sleep(1)
             return False
         time.sleep(0.3)
-    
+
     print(f"已连接到 {ssid}，网络配置：{wlan.ifconfig()}")
     return True
 
+
 # 主网络失败后尝试备用网络
 wifi_connected = connect_wifi('CrownYou', '3141592653', timeout=5)
-if not wifi_connected:
-    wifi_connected = connect_wifi('CMCC-EhtH', 'fxuu7433', timeout=5)
+# if not wifi_connected:
+#    wifi_connected = connect_wifi('CMCC-EhtH', 'fxuu7433', timeout=5)
 
 
 # 摄像头初始化
@@ -184,7 +188,7 @@ else:  # 不联网状态下的默认设置
     camera.saturation(0)
     camera.flip(0)
     camera.mirror(0)
-    camera.framesize(camera.FRAME_VGA)
+    camera.framesize(camera.FRAME_SVGA)
     camera.quality(10)
     camera.contrast(0)
     camera.whitebalance(camera.WB_NONE)
@@ -295,7 +299,7 @@ def listen_task():
             print('帧率调整成功')
         led.duty(light)
 
-        
+
 # 发送任务（包括发送图像和将图像写入sd卡
 def send_task():
     frame_number = 1
@@ -312,7 +316,8 @@ def send_task():
             break
         time.sleep(pre_sleep_time)
     camera.deinit()
-        
+
+
 if wifi_connected:
     _thread.start_new_thread(listen_task, ())
 send_task()
