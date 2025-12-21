@@ -7,9 +7,11 @@ import _thread
 from machine import Pin, PWM, SDCard
 import uos
 import os
-
+# 点亮一盏灯表示程序已经启动
+led = PWM(Pin(4))
+led.freq(3000)
+led.duty(5)
 sd_loaded = wifi_connected = False
-
 # SD 卡挂载路径（根据你的实际挂载点调整）
 SD_PATH = "/sd"
 
@@ -31,13 +33,33 @@ def delete_smallest_dir(path, dirs):
     os.rmdir(full_path)
 
 
+def remove_empty_dirs(path, dirs):
+    for dir in dirs:
+        full_path = path + "/" + dir
+        try:
+            os.stat(full_path + "/" + "10.jpg")
+            # 如果一个文件夹内存在10.jpg，说明不是空文件夹，则保留
+            print(full_path, "非空")
+        except Exception:
+            # 如果一个文件夹内不存在10.jpg，说明是空文件夹，需要删除
+            for file in os.listdir(full_path):
+                os.remove(full_path + "/" + file)
+            os.rmdir(full_path)
+            print("已删除空文件夹:", full_path)
+
+print('正在处理SD卡')
 try:
     uos.mount(SDCard(), SD_PATH)
+    print('识别到SD卡')
 except Exception:
     print('未识别到SD卡')
 else:
+    print('删除所有空目录')
+    dirs = get_numeric_dirs(SD_PATH)
+    remove_empty_dirs(SD_PATH, dirs)
     # 将新图片存在新文件夹中，SD中最多保留15个文件夹，自动删除最老的
     dirs = get_numeric_dirs(SD_PATH)
+    print(f'当前文件夹数量：{len(dirs)}')
 
     if len(dirs) >= 15:
         delete_smallest_dir(SD_PATH, dirs)
@@ -45,20 +67,10 @@ else:
 
     # 新建文件夹，名字为最大数字 + 1（new_path）
     next_name = int(max(dirs, default="0")) + 1
-    while True:
-        new_path = SD_PATH + "/" + str(next_name)
-        try:
-            os.mkdir(new_path)
-        except OSError as e:
-            if e.args[0] == 17:  # EEXIST，目录已存在
-                next_name += 1
-                continue
-            else:
-                break  # 其他错误就退出，不保存在SD卡上了
-        else:
-            sd_loaded = True
-            print(f"新视频将保存在{new_path}中")
-            break
+    new_path = SD_PATH + "/" + str(next_name)
+    os.mkdir(new_path)
+    sd_loaded = True
+    print(f"新视频将保存在{new_path}中")
 
 
 def connect_wifi(ssid, password, timeout=5):
@@ -89,6 +101,9 @@ def connect_wifi(ssid, password, timeout=5):
 wifi_connected = connect_wifi('CrownYou', '3141592653', timeout=5)
 # if not wifi_connected:
 #    wifi_connected = connect_wifi('CMCC-EhtH', 'fxuu7433', timeout=5)
+
+# 完成所有准备工作后，将灯熄灭
+led.duty(0)
 
 if wifi_connected or sd_loaded:
     # 摄像头初始化
@@ -168,8 +183,6 @@ if wifi_connected or sd_loaded:
             camera.framesize(camera.FRAME_SVGA)
         camera.quality(pre_quality)
         camera.contrast(pre_contrast)
-        led = PWM(Pin(4))
-        led.freq(70000)
         led.duty(light)
         if pre_wb == '无':
             camera.whitebalance(camera.WB_NONE)
@@ -315,5 +328,3 @@ if wifi_connected or sd_loaded:
     if wifi_connected:
         _thread.start_new_thread(listen_task, ())
     do_task()
-
-

@@ -13,7 +13,8 @@ mid_font = ('Noto Sans Mono', 10)
 canvas = tk.Canvas(window, width=800, height=600, bg='black')
 canvas.pack()
 current_index = 1
-image_nums = degree = 0
+image_nums = 0
+degree = 270
 paused_flag = False
 frame_rate = 10
 mirror = False
