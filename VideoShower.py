@@ -87,7 +87,7 @@ def change_progress(*args):
         paused_flag = False
 
 
-def pause():
+def pause(*args):
     global paused_flag
     paused_flag = not paused_flag
 
@@ -141,6 +141,7 @@ mir_button = tk.Button(frm1, text='镜像翻转', command=mir, font=mid_font)
 mir_button.grid(row=1, column=3, padx=10, pady=10)
 pause_button = tk.Button(frm1, text='暂停/播放', command=pause, font=mid_font)
 pause_button.grid(row=1, column=4, padx=10, pady=10)
+window.bind('<space>', pause)
 acc_button = tk.Button(frm1, text='加速', command=acc, font=mid_font)
 acc_button.grid(row=1, column=5, padx=10, pady=10)
 dec_button = tk.Button(frm1, text='减速', command=dec, font=mid_font)
