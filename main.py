@@ -7,6 +7,7 @@ import _thread
 from machine import Pin, PWM, SDCard
 import uos
 import os
+
 # 点亮一盏灯表示程序已经启动
 led = PWM(Pin(4))
 led.freq(3000)
@@ -33,6 +34,7 @@ def delete_smallest_dir(path, dirs):
     os.rmdir(full_path)
 
 
+# 删除空文件夹，也删除文件特别少的文件夹
 def remove_empty_dirs(path, dirs):
     for dir in dirs:
         full_path = path + "/" + dir
@@ -313,6 +315,7 @@ if wifi_connected or sd_loaded:
     # 发送图像和将图像写入sd卡
     def do_task():
         frame_number = 1
+        led_duty = 0
         while True:
             buf = camera.capture()  # 获取图像数据
             if wifi_connected:  # 向服务器发送图像数据
@@ -321,6 +324,14 @@ if wifi_connected or sd_loaded:
                 with open(f"{new_path}/{frame_number}.jpg", "wb") as f:
                     f.write(buf)
                 print(f'保存至{new_path}/{frame_number}.jpg')
+                # 周期性亮灯，使得摄像头能够看清仪表台上显示的时间
+                if not wifi_connected and frame_number % 20 == 0:
+                    if led_duty == 0:
+                        led_duty = 50
+                        led.duty(led_duty)
+                    elif led_duty == 50:
+                        led_duty = 0
+                        led.duty(led_duty)
                 frame_number += 1
             time.sleep(pre_sleep_time)
 
