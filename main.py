@@ -327,9 +327,9 @@ if wifi_connected or sd_loaded:
                 # 周期性亮灯，使得摄像头能够看清仪表台上显示的时间
                 if not wifi_connected and frame_number % 20 == 0:
                     if led_duty == 0:
-                        led_duty = 50
+                        led_duty = 80
                         led.duty(led_duty)
-                    elif led_duty == 50:
+                    elif led_duty == 80:
                         led_duty = 0
                         led.duty(led_duty)
                 frame_number += 1
@@ -339,3 +339,4 @@ if wifi_connected or sd_loaded:
     if wifi_connected:
         _thread.start_new_thread(listen_task, ())
     do_task()
+
